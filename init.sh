@@ -30,6 +30,8 @@ case $option in
         while read assign; do
         echo "$assign";
         done < <(sed -nr '/env:/,$ s/  ([A-Z_]+): (.*)/\1=\2/ p' mysql-deployment.yaml)
+        # GET NAME VARIABLE
+        #(sed -nr 's/(- name):(.*)/\2/p' mysql-deployment.yaml)
 	;;
 esac
 
