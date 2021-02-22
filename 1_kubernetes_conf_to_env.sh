@@ -1,4 +1,5 @@
 #!/bin/bash
+# Eduardo Mondragon
 echo " , __             _            _"
 echo "/|/  \           | |          | |"
 echo " |___/  __   __  | |   _ _|_  | |  __,"
@@ -13,11 +14,10 @@ echo ""
 read -p "Elije una opcion: " option
 case $option in
 	1)
-		echo "Descarga de deploymeny YAML"
-		read -p "Pega la URL del YAML " YAML_FILE
+		echo "Descarga de deployment .yaml"
+		read -p "Pega la URL del yaml: " YAML_FILE
         wget $YAML_FILE &> /dev/null
         filename=$(basename "$YAML_FILE")
-        #http://localhost/mysql-deployment.yaml
 
         if [[ "$?" != 0 ]]; then
             echo "Error downloading YAML: $filename"
@@ -26,12 +26,15 @@ case $option in
         fi
 	;;
 	2)
-		echo "Parse deploment YAML"
-        while read assign; do
-        echo "$assign";
-        done < <(sed -nr '/env:/,$ s/  ([A-Z_]+): (.*)/\1=\2/ p' mysql-deployment.yaml)
-        # GET NAME VARIABLE
-        #(sed -nr 's/(- name):(.*)/\2/p' mysql-deployment.yaml)
+        #!/usr/bin/env bash
+        read -p "Nombre del archivo de deployment: " D_YAML
+		echo "Setting Up Config to local ENV"
+        if [[ -f "$D_YAML" ]]; then
+            source <(sed -nE '/env:/,$ s/ (- name|value): (.*)/\2/p' $D_YAML | sed  "s/ //g" | awk '{ ORS = (NR%2 ? "=" : RS) } 1' | sed -E -n 's/[^#]+/export &/ p')
+            source setenv.sh
+        else
+            echo "No existe el archivo: $D_YAML"
+        fi
 	;;
 esac
 
