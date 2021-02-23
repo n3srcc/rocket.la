@@ -5,10 +5,10 @@ echo "/|/  \           | |          | |"
 echo " |___/  __   __  | |   _ _|_  | |  __,"
 echo " | \   /  \_/    |/_) |/  |   |/  /  |"
 echo " |  \_/\__/ \___/| \_/|__/|_/o|__/\_/|_/"
-echo "=============================================="
+echo "======================================================"
 echo "- 1. DESCARGAR YAML KUBERNETES"
-echo "- 2. EXTRAER CONFIGURACION Y ASIGNARLAS LOCALMENTE"
-echo "=============================================="
+echo "- 2. EXTRAER CONFIGURACION Y AGREGAR A AMBIENTE LOCAL"
+echo "======================================================"
 echo ""
 
 read -p "Elije una opcion: " option
@@ -26,12 +26,12 @@ case $option in
         fi
 	;;
 	2)
-        #!/usr/bin/env bash
         read -p "Nombre del archivo de deployment: " D_YAML
 		echo "Setting Up Config to local ENV"
         if [[ -f "$D_YAML" ]]; then
-            source <(sed -nE '/env:/,$ s/ (- name|value): (.*)/\2/p' $D_YAML | sed  "s/ //g" | awk '{ ORS = (NR%2 ? "=" : RS) } 1' | sed -E -n 's/[^#]+/export &/ p')
-            source setenv.sh
+            while read assign; do
+            export "$assign"; 
+            done < <(sed -nE '/env:/,$ s/ (- name|value): (.*)/\2/p' $D_YAML | sed  "s/ //g" | awk '{ ORS = (NR%2 ? "=" : RS) } 1' | sed -E -n 's/[^#]+/export &/ p')
         else
             echo "No existe el archivo: $D_YAML"
         fi
